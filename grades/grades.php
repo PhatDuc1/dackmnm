@@ -4,10 +4,11 @@
         header('location:login.php');
     }
 
-    include "../CRUD/connect.php"; // Kết nối đến cơ sở dữ liệu
+    include "../grades/connect.php"; // Kết nối đến cơ sở dữ liệu
 
-    // Truy vấn để lấy danh sách sinh viên
-    $sql = "SELECT * FROM students";
+    // Truy vấn để lấy thông tin điểm của sinh viên
+    $username = $_SESSION['username'];
+    $sql = "SELECT * FROM grades WHERE username='$username'";
     $result = mysqli_query($con, $sql);
 ?>
 
@@ -23,21 +24,20 @@
     integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" 
     crossorigin="anonymous">
 
-    <title>Thông Tin Sinh Viên</title>
+    <title>Thông Tin Điểm</title>
   </head>
   <body>
     <div class="container mt-5">
-        <h1 class="text-center">Thông Tin Sinh Viên</h1>
-        <button class="btn btn-primary mb-3"><a href="add_student.php" class="text-light">Thêm Sinh Viên</a></button>
-        <table class="table table-bordered">
+        <h1 class="text-center">Thông Tin Điểm</h1>
+        <button class="btn btn-primary mb-3"><a href="add_grades.php" class="text-light">Thêm Điểm</a></button>
+        <table class="table table-bordered mt-3">
             <thead>
                 <tr>
                     <th scope="col">STT</th>
-                    <th scope="col">Mã Sinh Viên</th>
-                    <th scope="col">Tên</th>
-                    <th scope="col">Email</th>
-                    <th scope="col">Số Điện Thoại</th>
-                    <th scope="col">Địa Chỉ</th>
+                    <th scope="col">MSSV</th>
+                    <th scope="col">Họ Tên</th>
+                    <th scope="col">Môn Học</th>
+                    <th scope="col">Điểm</th>
                     <th scope="col">Hành Động</th>
                 </tr>
             </thead>
@@ -48,14 +48,13 @@
                     while($row = mysqli_fetch_assoc($result)){
                         echo '<tr>
                                 <th scope="row">'.$stt.'</th>
-                                <td>'.$row['student_id'].'</td>
-                                <td>'.$row['name'].'</td>
-                                <td>'.$row['email'].'</td>
-                                <td>'.$row['phone'].'</td>
-                                <td>'.$row['address'].'</td>
+                                <td>'.$row['mssv'].'</td>
+                                <td>'.$row['ho_ten'].'</td>
+                                <td>'.$row['subject'].'</td>
+                                <td>'.$row['grade'].'</td>
                                 <td>
-                                    <a href="edit_student.php?id='.$row['id'].'" class="btn btn-warning btn-sm">Sửa</a>
-                                    <a href="delete_student.php?id='.$row['id'].'" class="btn btn-danger btn-sm" onclick="return confirm(\'Bạn có chắc chắn muốn xóa?\')">Xóa</a>
+                                    <a href="edit_grade.php?id='.$row['id'].'" class="btn btn-warning btn-sm">Sửa</a>
+                                    <a href="delete_grade.php?id='.$row['id'].'" class="btn btn-danger btn-sm" onclick="return confirm(\'Bạn có chắc chắn muốn xóa?\')">Xóa</a>
                                 </td>
                               </tr>';
                         $stt++;
