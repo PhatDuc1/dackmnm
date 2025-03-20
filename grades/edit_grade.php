@@ -58,7 +58,7 @@
                 <input type="text" class="form-control" id="ho_ten" name="ho_ten" value="<?php echo $row['ho_ten']; ?>" required>
             </div>
             <div class="form-group">
-                <label for="username">Tên Sinh Viên</label>
+                <label for="username">Vai Trò</label>
                 <input type="text" class="form-control" id="username" name="username" value="<?php echo $row['username']; ?>" required>
             </div>
             <div class="form-group">

@@ -4,7 +4,7 @@
         header('location:login.php');
     }
 
-    include "../grades/connect.php"; // Kết nối đến cơ sở dữ liệu
+    include "../exams/connect.php"; // Kết nối đến cơ sở dữ liệu
 
     // Check if search query is set
     $search_query = "";
@@ -12,9 +12,15 @@
         $search_query = $_GET['search'];
     }
 
-    // Truy vấn để lấy thông tin điểm của sinh viên
-    $username = $_SESSION['username'];
-    $sql = "SELECT * FROM grades WHERE username='$username' AND (mssv LIKE '%$search_query%' OR ho_ten LIKE '%$search_query%' OR subject LIKE '%$search_query%')";
+    // Handle form submission to delete an exam schedule
+    if(isset($_GET['delete'])){
+        $id = $_GET['delete'];
+        $sql = "DELETE FROM exam_schedule WHERE id='$id'";
+        mysqli_query($con, $sql);
+    }
+
+    // Fetch all exam schedules
+    $sql = "SELECT * FROM exam_schedule WHERE course_code LIKE '%$search_query%' OR exam_date LIKE '%$search_query%' OR location LIKE '%$search_query%'";
     $result = mysqli_query($con, $sql);
 ?>
 
@@ -30,25 +36,24 @@
     integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" 
     crossorigin="anonymous">
 
-    <title>Thông Tin Điểm</title>
+    <title>Quản Lý Lịch Thi</title>
   </head>
   <body>
     <div class="container mt-5">
-        <h1 class="text-center">Thông Tin Điểm</h1>
-        <form class="form-inline mb-3" method="GET" action="grades.php">
+        <h1 class="text-center">Quản Lý Lịch Thi</h1>
+        <form class="form-inline mb-3" method="GET" action="manage_exam_schedule.php">
             <input class="form-control mr-sm-2" type="search" placeholder="Tìm kiếm" aria-label="Search" name="search" value="<?php echo $search_query; ?>">
             <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Tìm kiếm</button>
         </form>
-        <button class="btn btn-primary mb-3"><a href="add_grades.php" class="text-light">Thêm Điểm</a></button>
+        <button class="btn btn-primary mb-3"><a href="add_exam_schedule.php" class="text-light">Thêm Lịch Thi</a></button>
         <table class="table table-bordered mt-3">
             <thead>
                 <tr>
                     <th scope="col">STT</th>
-                    <th scope="col">MSSV</th>
-                    <th scope="col">Họ Tên</th>
-                    <th scope="col">Môn Học</th>
-                    <th scope="col">Điểm</th>
-                    <th scope="col">Xếp Loại</th>
+                    <th scope="col">Mã Môn Học</th>
+                    <th scope="col">Ngày Thi</th>
+                    <th scope="col">Giờ Thi</th>
+                    <th scope="col">Địa Điểm</th>
                     <th scope="col">Hành Động</th>
                 </tr>
             </thead>
@@ -57,30 +62,15 @@
                 if($result){
                     $stt = 1;
                     while($row = mysqli_fetch_assoc($result)){
-                        // Classify the grade
-                        $grade_classification = '';
-                        if ($row['grade'] >= 9) {
-                            $grade_classification = 'A';
-                        } elseif ($row['grade'] >= 8) {
-                            $grade_classification = 'B';
-                        } elseif ($row['grade'] >= 7) {
-                            $grade_classification = 'C';
-                        } elseif ($row['grade'] >= 4) {
-                            $grade_classification = 'D';
-                        } else {
-                            $grade_classification = 'F';
-                        }
-
                         echo '<tr>
                                 <th scope="row">'.$stt.'</th>
-                                <td><a href="student_grades.php?mssv='.$row['mssv'].'">'.$row['mssv'].'</a></td>
-                                <td>'.$row['ho_ten'].'</td>
-                                <td>'.$row['subject'].'</td>
-                                <td>'.$row['grade'].'</td>
-                                <td>'.$grade_classification.'</td>
+                                <td>'.$row['course_code'].'</td>
+                                <td>'.$row['exam_date'].'</td>
+                                <td>'.$row['exam_time'].'</td>
+                                <td>'.$row['location'].'</td>
                                 <td>
-                                    <a href="edit_grade.php?id='.$row['id'].'" class="btn btn-warning btn-sm">Sửa</a>
-                                    <a href="delete_grade.php?id='.$row['id'].'" class="btn btn-danger btn-sm" onclick="return confirm(\'Bạn có chắc chắn muốn xóa?\')">Xóa</a>
+                                    <a href="edit_exam_schedule.php?id='.$row['id'].'" class="btn btn-warning btn-sm">Sửa</a>
+                                    <a href="manage_exam_schedule.php?delete='.$row['id'].'" class="btn btn-danger btn-sm" onclick="return confirm(\'Bạn có chắc chắn muốn xóa?\')">Xóa</a>
                                 </td>
                               </tr>';
                         $stt++;

@@ -6,8 +6,14 @@
 
     include "../courses/connect.php"; // Kết nối đến cơ sở dữ liệu
 
+    // Check if search query is set
+    $search_query = "";
+    if(isset($_GET['search'])){
+        $search_query = $_GET['search'];
+    }
+
     // Truy vấn để lấy danh sách môn học
-    $sql = "SELECT * FROM courses";
+    $sql = "SELECT * FROM courses WHERE course_code LIKE '%$search_query%' OR course_name LIKE '%$search_query%'";
     $result = mysqli_query($con, $sql);
 ?>
 
@@ -28,6 +34,10 @@
   <body>
     <div class="container mt-5">
         <h1 class="text-center">Quản Lý Môn Học</h1>
+        <form class="form-inline mb-3" method="GET" action="manage_courses.php">
+            <input class="form-control mr-sm-2" type="search" placeholder="Tìm kiếm" aria-label="Search" name="search" value="<?php echo $search_query; ?>">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Tìm kiếm</button>
+        </form>
         <button class="btn btn-primary mb-3"><a href="add_course.php" class="text-light">Thêm Môn Học</a></button>
         <table class="table table-bordered">
             <thead>

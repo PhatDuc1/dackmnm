@@ -4,7 +4,7 @@
         header('location:login.php');
     }
 
-    include "connect.php"; // Kết nối đến cơ sở dữ liệu
+    include "../CRUD/connect.php"; // Kết nối đến cơ sở dữ liệu
 
     // Xử lý thêm sinh viên
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {

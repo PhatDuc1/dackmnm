@@ -39,16 +39,19 @@
         <div class="row">
             <div class="col-md-12">
                 <a href="../CRUD/display.php" class="btn btn-block mb-3 custom-btn">
-                    <i class="fas fa-user-graduate"></i> Thông Tin Sinh Viên
+                    <i class="fas fa-user-graduate"></i> Quản Lí Sinh Viên
+                </a>
+                <a href="../lecturers/manage_lecturers.php" class="btn btn-block mb-3 custom-btn">
+                    <i class="fas fa-user-graduate"></i> Quản Lí Giảng Viên
                 </a>
                 <a href="../grades/grades.php" class="btn btn-block mb-3 custom-btn">
-                    <i class="fas fa-book"></i> Điểm
+                    <i class="fas fa-book"></i> Quản Lí Điểm
                 </a>
                 <a href="../courses/manage_courses.php" class="btn btn-block mb-3 custom-btn">
                     <i class="fas fa-clipboard-list"></i> Quản Lý Môn Học
                 </a>
-                <a href="exam_schedule.php" class="btn btn-block mb-3 custom-btn">
-                    <i class="fas fa-calendar-alt"></i> Xem Lịch Thi
+                <a href="../exams/manage_exam_schedule.php" class="btn btn-block mb-3 custom-btn">
+                    <i class="fas fa-calendar-alt"></i> Quản Lí Lịch Thi
                 </a>
                 <a href="logout.php" class="btn btn-block custom-btn">
                     <i class="fas fa-sign-out-alt"></i> Đăng xuất

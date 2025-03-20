@@ -51,7 +51,7 @@
                 <input type="text" class="form-control" id="ho_ten" name="ho_ten" required>
             </div>
             <div class="form-group">
-                <label for="username">Tên Sinh Viên</label>
+                <label for="username">Vai trò</label>
                 <input type="text" class="form-control" id="username" name="username" required>
             </div>
             <div class="form-group">

@@ -6,16 +6,18 @@
 
     include "../grades/connect.php"; // Kết nối đến cơ sở dữ liệu
 
-    // Check if search query is set
-    $search_query = "";
-    if(isset($_GET['search'])){
-        $search_query = $_GET['search'];
-    }
+    // Get the student's MSSV from the query string
+    $mssv = $_GET['mssv'];
 
     // Truy vấn để lấy thông tin điểm của sinh viên
-    $username = $_SESSION['username'];
-    $sql = "SELECT * FROM grades WHERE username='$username' AND (mssv LIKE '%$search_query%' OR ho_ten LIKE '%$search_query%' OR subject LIKE '%$search_query%')";
+    $sql = "SELECT * FROM grades WHERE mssv='$mssv'";
     $result = mysqli_query($con, $sql);
+
+    // Truy vấn để tính điểm trung bình của sinh viên
+    $avg_sql = "SELECT AVG(grade) as avg_grade FROM grades WHERE mssv='$mssv'";
+    $avg_result = mysqli_query($con, $avg_sql);
+    $avg_row = mysqli_fetch_assoc($avg_result);
+    $avg_grade = $avg_row['avg_grade'];
 ?>
 
 <!doctype html>
@@ -30,16 +32,11 @@
     integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" 
     crossorigin="anonymous">
 
-    <title>Thông Tin Điểm</title>
+    <title>Thông Tin Điểm Sinh Viên</title>
   </head>
   <body>
     <div class="container mt-5">
-        <h1 class="text-center">Thông Tin Điểm</h1>
-        <form class="form-inline mb-3" method="GET" action="grades.php">
-            <input class="form-control mr-sm-2" type="search" placeholder="Tìm kiếm" aria-label="Search" name="search" value="<?php echo $search_query; ?>">
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Tìm kiếm</button>
-        </form>
-        <button class="btn btn-primary mb-3"><a href="add_grades.php" class="text-light">Thêm Điểm</a></button>
+        <h1 class="text-center">Thông Tin Điểm Sinh Viên <?php echo $mssv; ?></h1>
         <table class="table table-bordered mt-3">
             <thead>
                 <tr>
@@ -49,7 +46,6 @@
                     <th scope="col">Môn Học</th>
                     <th scope="col">Điểm</th>
                     <th scope="col">Xếp Loại</th>
-                    <th scope="col">Hành Động</th>
                 </tr>
             </thead>
             <tbody>
@@ -73,15 +69,11 @@
 
                         echo '<tr>
                                 <th scope="row">'.$stt.'</th>
-                                <td><a href="student_grades.php?mssv='.$row['mssv'].'">'.$row['mssv'].'</a></td>
+                                <td>'.$row['mssv'].'</td>
                                 <td>'.$row['ho_ten'].'</td>
                                 <td>'.$row['subject'].'</td>
                                 <td>'.$row['grade'].'</td>
                                 <td>'.$grade_classification.'</td>
-                                <td>
-                                    <a href="edit_grade.php?id='.$row['id'].'" class="btn btn-warning btn-sm">Sửa</a>
-                                    <a href="delete_grade.php?id='.$row['id'].'" class="btn btn-danger btn-sm" onclick="return confirm(\'Bạn có chắc chắn muốn xóa?\')">Xóa</a>
-                                </td>
                               </tr>';
                         $stt++;
                     }
@@ -89,7 +81,10 @@
                 ?>
             </tbody>
         </table>
-        <button class="btn btn-secondary mt-3"><a href="../signup1/home.php" class="text-light">Quay lại</a></button>
+        <div class="text-center mt-3">
+            <h4>Điểm Trung Bình: <?php echo number_format($avg_grade, 2); ?></h4>
+        </div>
+        <button class="btn btn-secondary mt-3"><a href="grades.php" class="text-light">Quay lại</a></button>
     </div>
 
     <!-- Bootstrap JS and dependencies -->
