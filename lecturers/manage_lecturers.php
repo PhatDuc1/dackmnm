@@ -26,26 +26,140 @@
 
 <!doctype html>
 <html lang="en">
-  <head>
-    <!-- Required meta tags -->
+<head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" 
-    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" 
-    crossorigin="anonymous">
-
-    <title>Quản Lý Giảng Viên</title>
-  </head>
-  <body>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <title>Quản Lí Giảng Viên</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #2c3e50, #3498db); /* Gradient xanh đậm giống display.php */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 50px;
+            max-width: 1000px;
+        }
+        h1 {
+            color: #2c3e50;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .btn-custom {
+            transition: all 0.3s ease;
+        }
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .btn-primary {
+            background-color: #3498db;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+        .btn-danger {
+            background-color: #e74c3c;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+        }
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        .btn-warning {
+            background-color: #f1c40f;
+            border: none;
+            color: #fff;
+            padding: 8px 15px;
+            border-radius: 20px;
+        }
+        .btn-warning:hover {
+            background-color: #d4ac0d;
+        }
+        .btn-secondary {
+            background-color: #7f8c8d;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        .btn-secondary:hover {
+            background-color: #6c757d;
+        }
+        .table {
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .table th {
+            background-color: #34495e;
+            color: white;
+            text-align: center;
+        }
+        .table td {
+            vertical-align: middle;
+            text-align: center;
+        }
+        .search-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 25px;
+        }
+        .search-container .form-control {
+            border-radius: 20px 0 0 20px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            width: 300px;
+        }
+        .search-container .btn-primary {
+            border-radius: 0 20px 20px 0;
+            margin-left: -1px;
+        }
+        .search-container .btn-primary:hover {
+            background-color: #2980b9;
+        }
+        a.text-light, a.text-decoration-none {
+            text-decoration: none;
+            color: white;
+        }
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
     <div class="container mt-5">
-        <h1 class="text-center">Quản Lý Giảng Viên</h1>
-        <form class="form-inline mb-3" method="GET" action="manage_lecturers.php">
-            <input class="form-control mr-sm-2" type="search" placeholder="Tìm kiếm" aria-label="Search" name="search" value="<?php echo $search_query; ?>">
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Tìm kiếm</button>
-        </form>
-        <button class="btn btn-primary mb-3"><a href="add_lecturer.php" class="text-light">Thêm Giảng Viên</a></button>
+        <h1 class="text-center">Quản Lí Giảng Viên</h1>
+        <div class="search-container">
+            <form class="d-flex" method="GET" action="manage_lecturers.php">
+                <input class="form-control" type="search" placeholder="Tìm kiếm" aria-label="Search" name="search" value="<?php echo $search_query; ?>">
+                <button class="btn btn-primary btn-custom" type="submit">Tìm kiếm</button>
+            </form>
+        </div>
+        <div class="button-group">
+            <button class="btn btn-primary btn-custom"><a href="add_lecturer.php" class="text-light text-decoration-none">Thêm Giảng Viên</a></button>
+            <button class="btn btn-secondary btn-custom"><a href="../signup1/home.php" class="text-light"><i class="fas fa-arrow-left"></i> Quay lại</a></button>
+        </div>
         <table class="table table-bordered mt-3">
             <thead>
                 <tr>
@@ -71,8 +185,10 @@
                                 <td>'.$row['phone'].'</td>
                                 <td>'.$row['department'].'</td>
                                 <td>
-                                    <a href="edit_lecturer.php?id='.$row['id'].'" class="btn btn-warning btn-sm">Sửa</a>
-                                    <a href="manage_lecturers.php?delete='.$row['id'].'" class="btn btn-danger btn-sm" onclick="return confirm(\'Bạn có chắc chắn muốn xóa?\')">Xóa</a>
+                                    <div class="action-buttons">
+                                        <a href="edit_lecturer.php?id='.$row['id'].'" class="btn btn-warning btn-sm btn-custom">Sửa</a>
+                                        <a href="delete_lecturer.php?id='.$row['id'].'" class="btn btn-danger btn-sm btn-custom" onclick="return confirm(\'Bạn có chắc chắn muốn xóa?\')"><i class="fas fa-trash"></i> Xóa</a>
+                                    </div>
                                 </td>
                               </tr>';
                         $stt++;
@@ -81,12 +197,7 @@
                 ?>
             </tbody>
         </table>
-        <button class="btn btn-secondary mt-3"><a href="../signup1/home.php" class="text-light">Quay lại</a></button>
     </div>
-
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j6f3y4Qp9F4h+6U5L0Xbg" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-  </body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>

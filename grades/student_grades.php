@@ -7,7 +7,12 @@
     include "../grades/connect.php"; // Kết nối đến cơ sở dữ liệu
 
     // Get the student's MSSV from the query string
-    $mssv = $_GET['mssv'];
+    if (!isset($_GET['mssv'])) {
+        echo "<script>alert('Không tìm thấy MSSV!'); window.location.href='grades.php';</script>";
+        exit();
+    }
+
+    $mssv = mysqli_real_escape_string($con, $_GET['mssv']);
 
     // Truy vấn để lấy thông tin điểm của sinh viên
     $sql = "SELECT * FROM grades WHERE mssv='$mssv'";
@@ -23,21 +28,104 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" 
-    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" 
-    crossorigin="anonymous">
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <title>Thông Tin Điểm Sinh Viên</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #2c3e50, #3498db); /* Gradient giống manage_lecturers.php */
+            min-height: 100vh;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 20px;
+            max-width: 1000px;
+        }
+        h1 {
+            color: #2c3e50;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .table {
+            border-radius: 5px;
+            overflow: hidden;
+            background: #fff;
+        }
+        .table th {
+            background: #34495e;
+            color: white;
+            text-align: center;
+            padding: 12px;
+            font-weight: 500;
+        }
+        .table td {
+            vertical-align: middle;
+            text-align: center;
+            padding: 12px;
+        }
+        .table tbody tr {
+            border-bottom: 1px solid #e9ecef;
+        }
+        .btn-custom {
+            transition: all 0.3s ease;
+        }
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .btn-secondary {
+            background-color: #7f8c8d;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: block;
+            margin: 0 auto;
+        }
+        .btn-secondary:hover {
+            background-color: #6c757d;
+        }
+        a.text-light {
+            text-decoration: none;
+            color: white;
+        }
+        .text-center h4 {
+            color: #2c3e50;
+            font-weight: 600;
+            background: #e9ecef;
+            padding: 10px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-top: 20px;
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+            .table th, .table td {
+                font-size: 14px;
+                padding: 8px;
+            }
+        }
+    </style>
   </head>
   <body>
-    <div class="container mt-5">
-        <h1 class="text-center">Thông Tin Điểm Sinh Viên <?php echo $mssv; ?></h1>
-        <table class="table table-bordered mt-3">
+    <div class="container">
+        <h1 class="text-center">Thông Tin Điểm Sinh Viên</h1>
+        <table class="table mt-3">
             <thead>
                 <tr>
                     <th scope="col">STT</th>
@@ -81,15 +169,12 @@
                 ?>
             </tbody>
         </table>
-        <div class="text-center mt-3">
+        <div class="text-center">
             <h4>Điểm Trung Bình: <?php echo number_format($avg_grade, 2); ?></h4>
         </div>
-        <button class="btn btn-secondary mt-3"><a href="grades.php" class="text-light">Quay lại</a></button>
+        <button class="btn btn-secondary btn-custom mt-3"><a href="grades.php" class="text-light"><i class="fas fa-arrow-left"></i> Quay lại</a></button>
     </div>
 
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j6f3y4Qp9F4h+6U5L0Xbg" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>

@@ -27,44 +27,134 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" 
     integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" 
     crossorigin="anonymous">
-
     <title>Thêm Điểm</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e3c72, #2a5298); /* Gradient giống edit_lecturer.php */
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            max-width: 600px;
+            margin: 20px;
+        }
+        h1 {
+            font-size: 2rem;
+            color: #2a5298;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+        .form-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        .form-control {
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            padding: 12px;
+            transition: border-color 0.3s ease;
+        }
+        .form-control:focus {
+            border-color: #2a5298;
+            box-shadow: 0 0 5px rgba(42, 82, 152, 0.3);
+            outline: none;
+        }
+        .btn-custom {
+            background: linear-gradient(45deg, #2a5298, #1e3c72);
+            border: none;
+            padding: 12px 24px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .btn-custom:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(42, 82, 152, 0.4);
+        }
+        .btn-secondary {
+            background: #6c757d;
+            border: none;
+            padding: 12px 24px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: transform 0.3s ease;
+        }
+        .btn-secondary:hover {
+            transform: translateY(-3px);
+            background: #5a6268;
+        }
+        .mb-3 {
+            margin-bottom: 20px !important;
+        }
+        .d-flex {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        a.text-light {
+            text-decoration: none;
+            color: white;
+        }
+        @media (max-width: 576px) {
+            .container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+            .d-flex {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
   </head>
   <body>
-    <div class="container mt-5">
+    <div class="container">
         <h1 class="text-center">Thêm Điểm</h1>
         <form method="POST" action="add_grades.php">
-            <div class="form-group">
-                <label for="mssv">MSSV</label>
-                <input type="text" class="form-control" id="mssv" name="mssv" required>
+            <div class="mb-3">
+                <label class="form-label">MSSV</label>
+                <input type="text" class="form-control" name="mssv" required>
             </div>
-            <div class="form-group">
-                <label for="ho_ten">Họ Tên</label>
-                <input type="text" class="form-control" id="ho_ten" name="ho_ten" required>
+            <div class="mb-3">
+                <label class="form-label">Họ Tên</label>
+                <input type="text" class="form-control" name="ho_ten" required>
             </div>
-            <div class="form-group">
-                <label for="username">Vai trò</label>
-                <input type="text" class="form-control" id="username" name="username" required>
+            <div class="mb-3">
+                <label class="form-label">Vai Trò</label>
+                <input type="text" class="form-control" name="username" required>
             </div>
-            <div class="form-group">
-                <label for="subject">Môn Học</label>
-                <input type="text" class="form-control" id="subject" name="subject" required>
+            <div class="mb-3">
+                <label class="form-label">Môn Học</label>
+                <input type="text" class="form-control" name="subject" required>
             </div>
-            <div class="form-group">
-                <label for="grade">Điểm</label>
-                <input type="text" class="form-control" id="grade" name="grade" required>
+            <div class="mb-3">
+                <label class="form-label">Điểm</label>
+                <input type="text" class="form-control" name="grade" required>
             </div>
-            <button type="submit" class="btn btn-primary">Thêm Điểm</button>
+            <div class="d-flex">
+                <button class="btn btn-custom" type="submit">Thêm Điểm</button>
+                <a href="grades.php" class="btn btn-secondary">Quay lại</a>
+            </div>
         </form>
-        <button class="btn btn-secondary mt-3"><a href="grades.php" class="text-light">Quay lại</a></button>
     </div>
   </body>
 </html>

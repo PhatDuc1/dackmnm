@@ -36,20 +36,96 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" 
-    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" 
-    crossorigin="anonymous">
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <title>Sửa Thông Tin Sinh Viên</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #2c3e50, #3498db); /* Gradient xanh đậm */
+            font-family: 'Roboto', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.95); /* Nền trắng mờ nhẹ */
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            transition: transform 0.3s ease;
+        }
+        .container:hover {
+            transform: translateY(-5px);
+        }
+        h1.text-primary {
+            color: #3498db !important;
+            font-weight: 700;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            color: #2c3e50;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        .form-control {
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            padding: 12px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .form-control:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 8px rgba(52, 152, 219, 0.4);
+        }
+        .btn-custom {
+            background: linear-gradient(45deg, #e67e22, #f1c40f); /* Gradient cam-vàng */
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 25px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-custom:hover {
+            background: linear-gradient(45deg, #d35400, #f39c12);
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(230, 126, 34, 0.5);
+        }
+        .btn-secondary {
+            background: linear-gradient(45deg, #7f8c8d, #95a5a6);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-secondary:hover {
+            background: linear-gradient(45deg, #6c757d, #839192);
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(127, 140, 141, 0.5);
+        }
+        a.text-light {
+            color: white;
+            text-decoration: none;
+        }
+    </style>
   </head>
   <body>
     <div class="container mt-5">
-        <h1 class="text-center">Sửa Thông Tin Sinh Viên</h1>
+        <h1 class="text-center text-primary">Sửa Thông Tin Sinh Viên</h1>
         <form method="POST" action="edit_student.php?id=<?php echo $id; ?>" class="mb-4">
             <div class="form-group">
                 <label for="student_id">Mã Sinh Viên</label>
@@ -71,9 +147,12 @@
                 <label for="address">Địa Chỉ</label>
                 <input type="text" class="form-control" id="address" name="address" value="<?php echo $row['address']; ?>" required>
             </div>
-            <button type="submit" class="btn btn-primary">Cập Nhật</button>
+            <button type="submit" class="btn btn-custom w-100">Cập Nhật</button>
         </form>
-        <button class="btn btn-secondary mt-3"><a href="display.php" class="text-light">Quay lại</a></button>
+        <div class="text-center">
+            <a href="display.php" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Quay lại</a>
+        </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>

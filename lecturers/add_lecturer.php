@@ -25,34 +25,117 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" 
-    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" 
-    crossorigin="anonymous">
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <title>Thêm Giảng Viên</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Poppins', sans-serif;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            max-width: 600px;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #2a5298;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .form-label {
+            font-weight: 500;
+            color: #333;
+        }
+        .form-control {
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            padding: 12px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .form-control:focus {
+            border-color: #2a5298;
+            box-shadow: 0 0 8px rgba(42, 82, 152, 0.3);
+        }
+        .btn-custom {
+            background: linear-gradient(to right, #2a5298, #1e3c72);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-weight: 500;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .btn-custom:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(42, 82, 152, 0.4);
+        }
+        .btn-secondary {
+            background: #6c757d;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            color: white;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .btn-secondary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.4);
+        }
+        .mb-3 {
+            position: relative;
+        }
+        .form-control:valid + .form-label {
+            color: #2a5298;
+        }
+    </style>
   </head>
   <body>
-    <div class="container mt-5">
+    <div class="container">
         <h1 class="text-center">Thêm Giảng Viên</h1>
-        <form class="form-inline mb-3" method="POST" action="add_lecturer.php">
-            <input class="form-control mr-sm-2" type="text" placeholder="Mã Giảng Viên" name="lecturer_id" required>
-            <input class="form-control mr-sm-2" type="text" placeholder="Tên" name="name" required>
-            <input class="form-control mr-sm-2" type="email" placeholder="Email" name="email" required>
-            <input class="form-control mr-sm-2" type="text" placeholder="Số Điện Thoại" name="phone" required>
-            <input class="form-control mr-sm-2" type="text" placeholder="Khoa" name="department" required>
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit" name="add_lecturer">Thêm Giảng Viên</button>
+        <form method="POST" action="add_lecturer.php">
+            <div class="mb-3">
+                <label class="form-label">Mã Giảng Viên</label>
+                <input type="text" class="form-control" name="lecturer_id" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Tên</label>
+                <input type="text" class="form-control" name="name" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" name="email" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Số Điện Thoại</label>
+                <input type="text" class="form-control" name="phone" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Khoa</label>
+                <input type="text" class="form-control" name="department" required>
+            </div>
+            <div class="d-flex justify-content-between">
+                <button class="btn btn-custom" type="submit" name="add_lecturer">Thêm Giảng Viên</button>
+                <a href="manage_lecturers.php" class="btn btn-secondary">Quay lại</a>
+            </div>
         </form>
-        <button class="btn btn-secondary mt-3"><a href="manage_lecturers.php" class="text-light">Quay lại</a></button>
     </div>
-
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j6f3y4Qp9F4h+6U5L0Xbg" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>

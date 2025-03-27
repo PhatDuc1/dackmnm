@@ -4,29 +4,35 @@
         header('location:login.php');
     }
 
-    include "../exams/connect.php"; // Kết nối đến cơ sở dữ liệu
+    include "../courses/connect.php"; // Kết nối đến cơ sở dữ liệu
 
-    // Check if search query is set
-    $search_query = "";
-    if(isset($_GET['search'])){
-        $search_query = mysqli_real_escape_string($con, $_GET['search']);
-    }
+    // Lấy danh sách môn học từ bảng courses
+    $sql = "SELECT * FROM courses";
+    $result = mysqli_query($con, $sql);
 
-    // Handle form submission to delete an exam schedule
-    if(isset($_GET['delete'])){
-        $id = mysqli_real_escape_string($con, $_GET['delete']);
-        $sql = "DELETE FROM exam_schedule WHERE id='$id'";
-        $result = mysqli_query($con, $sql);
-        if ($result) {
-            echo "<script>alert('Xóa lịch thi thành công!'); window.location.href='manage_exam_schedule.php';</script>";
+    // Xử lý đăng ký môn học
+    if (isset($_POST['register_course'])) {
+        $username = mysqli_real_escape_string($con, $_SESSION['username']);
+        $course_id = mysqli_real_escape_string($con, $_POST['course_id']);
+
+        // Kiểm tra xem sinh viên đã đăng ký môn học này chưa
+        $check_sql = "SELECT * FROM course_registrations WHERE username='$username' AND course_id='$course_id'";
+        $check_result = mysqli_query($con, $check_sql);
+
+        if (mysqli_num_rows($check_result) > 0) {
+            echo "<script>alert('Bạn đã đăng ký môn học này rồi!');</script>";
         } else {
-            echo "<script>alert('Có lỗi xảy ra: " . mysqli_error($con) . "'); window.location.href='manage_exam_schedule.php';</script>";
+            // Thêm thông tin đăng ký vào bảng course_registrations
+            $insert_sql = "INSERT INTO course_registrations (username, course_id) VALUES ('$username', '$course_id')";
+            $insert_result = mysqli_query($con, $insert_sql);
+
+            if ($insert_result) {
+                echo "<script>alert('Đăng ký môn học thành công!');</script>";
+            } else {
+                echo "<script>alert('Có lỗi xảy ra: " . mysqli_error($con) . "');</script>";
+            }
         }
     }
-
-    // Fetch all exam schedules
-    $sql = "SELECT * FROM exam_schedule WHERE course_code LIKE '%$search_query%' OR exam_date LIKE '%$search_query%' OR location LIKE '%$search_query%'";
-    $result = mysqli_query($con, $sql);
 ?>
 
 <!doctype html>
@@ -38,12 +44,14 @@
     integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" 
     crossorigin="anonymous">
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-    <title>Quản Lý Lịch Thi</title>
+    <!-- Thêm font Roboto từ Google Fonts để hỗ trợ tiếng Việt -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <title>Đăng Ký Môn Học</title>
     <style>
         body {
-            background: linear-gradient(135deg, #2c3e50, #3498db); /* Gradient giống manage_lecturers.php */
+            background: linear-gradient(135deg, #2c3e50, #3498db); /* Gradient giống manage_courses.php */
             min-height: 100vh;
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Roboto', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -61,29 +69,6 @@
             font-weight: 700;
             text-align: center;
             margin-bottom: 20px;
-        }
-        .search-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 5px;
-            margin-bottom: 25px;
-        }
-        .search-container .form-control {
-            border-radius: 20px 0 0 20px;
-            border: 1px solid #ddd;
-            padding: 10px;
-            width: 300px;
-        }
-        .search-container .btn-primary {
-            border-radius: 0 20px 20px 0;
-            margin-left: -1px;
-            background-color: #3498db;
-            border: none;
-            font-weight: bold;
-        }
-        .search-container .btn-primary:hover {
-            background-color: #2980b9;
         }
         .button-group {
             display: flex;
@@ -118,25 +103,6 @@
         }
         .btn-secondary:hover {
             background-color: #6c757d;
-        }
-        .btn-warning {
-            background-color: #f1c40f;
-            border: none;
-            color: #fff;
-            padding: 8px 15px;
-            border-radius: 20px;
-        }
-        .btn-warning:hover {
-            background-color: #d4ac0d;
-        }
-        .btn-danger {
-            background-color: #e74c3c;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 20px;
-        }
-        .btn-danger:hover {
-            background-color: #c0392b;
         }
         .table {
             border-radius: 5px;
@@ -174,9 +140,6 @@
             h1 {
                 font-size: 1.5rem;
             }
-            .search-container .form-control {
-                width: 100%;
-            }
             .button-group {
                 flex-direction: column;
                 gap: 10px;
@@ -190,25 +153,19 @@
   </head>
   <body>
     <div class="container">
-        <h1>Quản Lý Lịch Thi</h1>
-        <div class="search-container">
-            <form class="d-flex" method="GET" action="manage_exam_schedule.php">
-                <input class="form-control" type="search" placeholder="Tìm kiếm" aria-label="Search" name="search" value="<?php echo htmlspecialchars($search_query); ?>">
-                <button class="btn btn-primary btn-custom" type="submit">Tìm kiếm</button>
-            </form>
-        </div>
+        <h1>Đăng Ký Môn Học</h1>
         <div class="button-group">
-            <button class="btn btn-primary btn-custom"><a href="add_exam_schedule.php" class="text-light text-decoration-none">Thêm Lịch Thi</a></button>
-            <button class="btn btn-secondary btn-custom"><a href="../signup1/home.php" class="text-light text-decoration-none"><i class="fas fa-arrow-left"></i> Quay lại</a></button>
+            <button class="btn btn-secondary btn-custom">
+                <a href="../signup1/home.php" class="text-light text-decoration-none"><i class="fas fa-arrow-left"></i> Quay lại</a>
+            </button>
         </div>
         <table class="table mt-3">
             <thead>
                 <tr>
                     <th scope="col">STT</th>
                     <th scope="col">Mã Môn Học</th>
-                    <th scope="col">Ngày Thi</th>
-                    <th scope="col">Giờ Thi</th>
-                    <th scope="col">Địa Điểm</th>
+                    <th scope="col">Tên Môn Học</th>
+                    <th scope="col">Số Tín Chỉ</th>
                     <th scope="col">Hành Động</th>
                 </tr>
             </thead>
@@ -220,14 +177,13 @@
                         echo '<tr>
                                 <th scope="row">'.$stt.'</th>
                                 <td>'.$row['course_code'].'</td>
-                                <td>'.$row['exam_date'].'</td>
-                                <td>'.$row['exam_time'].'</td>
-                                <td>'.$row['location'].'</td>
+                                <td>'.$row['course_name'].'</td>
+                                <td>'.$row['credits'].'</td>
                                 <td>
-                                    <div class="action-buttons">
-                                        <a href="edit_exam_schedule.php?id='.$row['id'].'" class="btn btn-warning btn-sm btn-custom">Sửa</a>
-                                        <a href="manage_exam_schedule.php?delete='.$row['id'].'" class="btn btn-danger btn-sm btn-custom" onclick="return confirm(\'Bạn có chắc chắn muốn xóa?\')"><i class="fas fa-trash"></i> Xóa</a>
-                                    </div>
+                                    <form method="POST" action="register_course.php">
+                                        <input type="hidden" name="course_id" value="'.$row['id'].'">
+                                        <button type="submit" name="register_course" class="btn btn-primary btn-sm btn-custom">Đăng Ký</button>
+                                    </form>
                                 </td>
                               </tr>';
                         $stt++;
