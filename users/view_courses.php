@@ -1,38 +1,20 @@
 <?php
     session_start();
     if(!isset($_SESSION['username'])){
-        header('location:login.php');
+        header('location:../signup1/login.php');
     }
 
-    include "../courses/connect.php"; // Kết nối đến cơ sở dữ liệu
+    include "connect.php";
 
-    // Lấy danh sách môn học từ bảng courses
-    $sql = "SELECT * FROM courses";
+    // Check if search query is set
+    $search_query = "";
+    if(isset($_GET['search'])){
+        $search_query = mysqli_real_escape_string($con, $_GET['search']);
+    }
+
+    // Truy vấn để lấy danh sách môn học
+    $sql = "SELECT * FROM courses WHERE course_code LIKE '%$search_query%' OR course_name LIKE '%$search_query%'";
     $result = mysqli_query($con, $sql);
-
-    // Xử lý đăng ký môn học
-    if (isset($_POST['register_course'])) {
-        $username = mysqli_real_escape_string($con, $_SESSION['username']);
-        $course_id = mysqli_real_escape_string($con, $_POST['course_id']);
-
-        // Kiểm tra xem sinh viên đã đăng ký môn học này chưa
-        $check_sql = "SELECT * FROM course_registrations WHERE username='$username' AND course_id='$course_id'";
-        $check_result = mysqli_query($con, $check_sql);
-
-        if (mysqli_num_rows($check_result) > 0) {
-            echo "<script>alert('Bạn đã đăng ký môn học này rồi!');</script>";
-        } else {
-            // Thêm thông tin đăng ký vào bảng course_registrations
-            $insert_sql = "INSERT INTO course_registrations (username, course_id) VALUES ('$username', '$course_id')";
-            $insert_result = mysqli_query($con, $insert_sql);
-
-            if ($insert_result) {
-                echo "<script>alert('Đăng ký môn học thành công!');</script>";
-            } else {
-                echo "<script>alert('Có lỗi xảy ra: " . mysqli_error($con) . "');</script>";
-            }
-        }
-    }
 ?>
 
 <!doctype html>
@@ -44,14 +26,12 @@
     integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" 
     crossorigin="anonymous">
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-    <!-- Thêm font Roboto từ Google Fonts để hỗ trợ tiếng Việt -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <title>Đăng Ký Môn Học</title>
+    <title>Danh Sách Môn Học</title>
     <style>
         body {
-            background: linear-gradient(135deg, #2c3e50, #3498db); /* Gradient giống manage_courses.php */
+            background: linear-gradient(135deg, #2c3e50, #3498db);
             min-height: 100vh;
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -70,28 +50,27 @@
             text-align: center;
             margin-bottom: 20px;
         }
-        .button-group {
+        .search-container {
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 15px;
+            gap: 5px;
             margin-bottom: 25px;
         }
-        .btn-custom {
-            transition: all 0.3s ease;
+        .search-container .form-control {
+            border-radius: 20px 0 0 20px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            width: 300px;
         }
-        .btn-custom:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-        .btn-primary {
+        .search-container .btn-primary {
+            border-radius: 0 20px 20px 0;
+            margin-left: -1px;
             background-color: #3498db;
             border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
             font-weight: bold;
         }
-        .btn-primary:hover {
+        .search-container .btn-primary:hover {
             background-color: #2980b9;
         }
         .btn-secondary {
@@ -100,6 +79,7 @@
             padding: 10px 20px;
             border-radius: 20px;
             font-weight: bold;
+            margin-bottom: 20px;
         }
         .btn-secondary:hover {
             background-color: #6c757d;
@@ -124,12 +104,7 @@
         .table tbody tr {
             border-bottom: 1px solid #e9ecef;
         }
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-        }
-        a.text-light, a.text-decoration-none {
+        a.text-light {
             text-decoration: none;
             color: white;
         }
@@ -140,9 +115,8 @@
             h1 {
                 font-size: 1.5rem;
             }
-            .button-group {
-                flex-direction: column;
-                gap: 10px;
+            .search-container .form-control {
+                width: 100%;
             }
             .table th, .table td {
                 font-size: 14px;
@@ -153,20 +127,23 @@
   </head>
   <body>
     <div class="container">
-        <h1>Đăng Ký Môn Học</h1>
-        <div class="button-group">
-            <button class="btn btn-secondary btn-custom">
-                <a href="../signup1/home.php" class="text-light text-decoration-none"><i class="fas fa-arrow-left"></i> Quay lại</a>
-            </button>
+        <h1>Danh Sách Môn Học</h1>
+        <div class="search-container">
+            <form class="d-flex" method="GET" action="view_courses.php">
+                <input class="form-control" type="search" placeholder="Tìm kiếm" aria-label="Search" name="search" value="<?php echo htmlspecialchars($search_query); ?>">
+                <button class="btn btn-primary" type="submit">Tìm kiếm</button>
+            </form>
         </div>
-        <table class="table mt-3">
+        <div class="text-center">
+            <button class="btn btn-secondary"><a href="../users/register_course.php" class="text-light"><i class="fas fa-arrow-left"></i> Quay lại</a></button>
+        </div>
+        <table class="table">
             <thead>
                 <tr>
                     <th scope="col">STT</th>
                     <th scope="col">Mã Môn Học</th>
                     <th scope="col">Tên Môn Học</th>
                     <th scope="col">Số Tín Chỉ</th>
-                    <th scope="col">Hành Động</th>
                 </tr>
             </thead>
             <tbody>
@@ -179,12 +156,6 @@
                                 <td>'.$row['course_code'].'</td>
                                 <td>'.$row['course_name'].'</td>
                                 <td>'.$row['credits'].'</td>
-                                <td>
-                                    <form method="POST" action="register_course.php">
-                                        <input type="hidden" name="course_id" value="'.$row['id'].'">
-                                        <button type="submit" name="register_course" class="btn btn-primary btn-sm btn-custom">Đăng Ký</button>
-                                    </form>
-                                </td>
                               </tr>';
                         $stt++;
                     }

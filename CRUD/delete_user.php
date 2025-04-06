@@ -8,11 +8,11 @@
 
     if (isset($_GET['id'])) {
         $id = $_GET['id'];
-        $sql = "DELETE FROM students WHERE id='$id'";
+        $sql = "DELETE FROM users WHERE id='$id'";
         $result = mysqli_query($con, $sql);
 
         if ($result) {
-            echo "<script>alert('Xóa sinh viên thành công!'); window.location.href='display.php';</script>";
+            echo "<script>alert('Xóa người dùng thành công!'); window.location.href='display.php';</script>";
         } else {
             echo "<script>alert('Có lỗi xảy ra: " . mysqli_error($con) . "');</script>";
         }

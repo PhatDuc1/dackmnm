@@ -1,18 +1,22 @@
 <?php
     session_start();
-    if(!isset($_SESSION['username'])){
-        header('location:login.php');
+    if(!isset($_SESSION['username']) || !isset($_SESSION['mssv'])){
+        header('location:../signup1/login.php');
+        exit();
+    }
+
+    // Lấy MSSV từ GET hoặc từ session nếu không có GET
+    $mssv = isset($_GET['mssv']) ? $_GET['mssv'] : $_SESSION['mssv'];
+
+    // Kiểm tra xem sinh viên chỉ xem được điểm của chính mình
+    if($_SESSION['role'] == 'user' && $_SESSION['mssv'] != $mssv) {
+        echo "<script>alert('Bạn không có quyền xem điểm của sinh viên khác!'); window.location.href='../users/user_home.php';</script>";
+        exit();
     }
 
     include "../grades/connect.php"; // Kết nối đến cơ sở dữ liệu
 
-    // Get the student's MSSV from the query string
-    if (!isset($_GET['mssv'])) {
-        echo "<script>alert('Không tìm thấy MSSV!'); window.location.href='grades.php';</script>";
-        exit();
-    }
-
-    $mssv = mysqli_real_escape_string($con, $_GET['mssv']);
+    $mssv = mysqli_real_escape_string($con, $mssv);
 
     // Truy vấn để lấy thông tin điểm của sinh viên
     $sql = "SELECT * FROM grades WHERE mssv='$mssv'";
@@ -172,7 +176,7 @@
         <div class="text-center">
             <h4>Điểm Trung Bình: <?php echo number_format($avg_grade, 2); ?></h4>
         </div>
-        <button class="btn btn-secondary btn-custom mt-3"><a href="grades.php" class="text-light"><i class="fas fa-arrow-left"></i> Quay lại</a></button>
+        <button class="btn btn-secondary btn-custom mt-3"><a href="../users/user_home.php" class="text-light"><i class="fas fa-arrow-left"></i> Quay lại</a></button>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

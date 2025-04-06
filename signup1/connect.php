@@ -2,7 +2,7 @@
     $HOSTNAME='localhost';
     $USERNAME='root'; 
     $PASSWORD='';
-    $DATABaSE='signupforms';
+    $DATABaSE='quanlisinhvien';
 
     $con=mysqli_connect($HOSTNAME,$USERNAME,$PASSWORD,$DATABaSE);
 

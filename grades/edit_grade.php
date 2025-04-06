@@ -14,19 +14,51 @@
     }
 
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-        $mssv = $_POST['mssv'];
-        $ho_ten = $_POST['ho_ten'];
-        $username = $_POST['username'];
-        $subject = $_POST['subject'];
-        $grade = $_POST['grade'];
+        $errors = array();
 
-        $sql = "UPDATE grades SET mssv='$mssv', ho_ten='$ho_ten', username='$username', subject='$subject', grade='$grade' WHERE id='$id'";
-        $result = mysqli_query($con, $sql);
+        $mssv = mysqli_real_escape_string($con, trim($_POST['mssv']));
+        $ho_ten = mysqli_real_escape_string($con, trim($_POST['ho_ten']));
+        $username = mysqli_real_escape_string($con, trim($_POST['username']));
+        $subject = mysqli_real_escape_string($con, trim($_POST['subject']));
+        $grade = mysqli_real_escape_string($con, trim($_POST['grade']));
 
-        if ($result) {
-            echo "<script>alert('Cập nhật điểm thành công!'); window.location.href='grades.php';</script>";
-        } else {
-            echo "<script>alert('Có lỗi xảy ra: " . mysqli_error($con) . "');</script>";
+        // Validate họ tên
+        if (empty($ho_ten)) {
+            $errors[] = "Họ tên không được để trống";
+        }
+
+        // Validate điểm số
+        if (!is_numeric($grade) || $grade < 0 || $grade > 10) {
+            $errors[] = "Điểm phải là số từ 0 đến 10";
+        }
+
+        // Kiểm tra xem môn học có tồn tại
+        $check_subject = mysqli_query($con, "SELECT * FROM courses WHERE course_name = '$subject'");
+        if ($check_subject && mysqli_num_rows($check_subject) == 0) {
+            $errors[] = "Môn học này không tồn tại trong hệ thống";
+        } elseif (!$check_subject) {
+            $errors[] = "Lỗi khi kiểm tra môn học: " . mysqli_error($con);
+        }
+
+        if (empty($errors)) {
+            $sql = "UPDATE grades SET mssv=?, ho_ten=?, username=?, subject=?, grade=? WHERE id=?";
+            $stmt = mysqli_prepare($con, $sql);
+            mysqli_stmt_bind_param($stmt, "ssssdi", $mssv, $ho_ten, $username, $subject, $grade, $id);
+
+            if (mysqli_stmt_execute($stmt)) {
+                echo "<script>alert('Cập nhật điểm thành công!'); window.location.href='grades.php';</script>";
+            } else {
+                $errors[] = "Có lỗi xảy ra: " . mysqli_error($con);
+            }
+            mysqli_stmt_close($stmt);
+        }
+
+        if (!empty($errors)) {
+            echo "<div class='alert alert-danger mt-3 animate__animated animate__fadeIn'>";
+            foreach ($errors as $error) {
+                echo "<p class='mb-0'>$error</p>";
+            }
+            echo "</div>";
         }
     }
 ?>

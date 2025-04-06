@@ -158,7 +158,7 @@
         </div>
         <div class="button-group">
             <button class="btn btn-primary btn-custom"><a href="add_lecturer.php" class="text-light text-decoration-none">Thêm Giảng Viên</a></button>
-            <button class="btn btn-secondary btn-custom"><a href="../signup1/home.php" class="text-light"><i class="fas fa-arrow-left"></i> Quay lại</a></button>
+            <button class="btn btn-secondary btn-custom"><a href="../signup1/admin_home.php" class="text-light"><i class="fas fa-arrow-left"></i> Quay lại</a></button>
         </div>
         <table class="table table-bordered mt-3">
             <thead>

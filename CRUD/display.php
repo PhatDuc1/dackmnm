@@ -4,193 +4,260 @@
         header('location:login.php');
     }
 
-    include "../CRUD/connect.php"; // Kết nối đến cơ sở dữ liệu
+    include "./connect.php";
 
-    // Check if search query is set
-    $search_query = "";
-    if(isset($_GET['search'])){
-        $search_query = $_GET['search'];
-    }
+    // Lấy thống kê
+    $stats_sql = "SELECT
+        COUNT(*) as total_users,
+        COUNT(DISTINCT mssv) as total_students
+    FROM users WHERE role = 'user'";
+    $stats_result = mysqli_query($con, $stats_sql);
+    $stats = mysqli_fetch_assoc($stats_result);
 
-    // Truy vấn để lấy danh sách sinh viên
-    $sql = "SELECT * FROM students WHERE name LIKE '%$search_query%' OR student_id LIKE '%$search_query%'";
-    $result = mysqli_query($con, $sql);
+    // Xử lý tìm kiếm an toàn
+    $search_query = isset($_GET['search']) ? mysqli_real_escape_string($con, $_GET['search']) : '';
+
+    // Xử lý phân trang
+    $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    $limit = 10;
+    $offset = ($page - 1) * $limit;
+
+    // Truy vấn dữ liệu với prepared statement
+    $sql = "SELECT id, mssv, username, email, mobile, address
+            FROM users
+            WHERE role = 'user' AND (mssv LIKE ? OR username LIKE ? OR email LIKE ? OR mobile LIKE ?)
+            ORDER BY mssv LIMIT ? OFFSET ?";
+
+    $stmt = mysqli_prepare($con, $sql);
+    $search_pattern = "%$search_query%";
+    mysqli_stmt_bind_param($stmt, "ssssii", $search_pattern, $search_pattern, $search_pattern, $search_pattern, $limit, $offset);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+
+    // Đếm tổng số bản ghi
+    $count_sql = "SELECT COUNT(*) as total FROM users WHERE role = 'user' AND (mssv LIKE ? OR username LIKE ? OR email LIKE ? OR mobile LIKE ?)";
+    $count_stmt = mysqli_prepare($con, $count_sql);
+    mysqli_stmt_bind_param($count_stmt, "ssss", $search_pattern, $search_pattern, $search_pattern, $search_pattern);
+    mysqli_stmt_execute($count_stmt);
+    $count_result = mysqli_stmt_get_result($count_stmt);
+    $count_row = mysqli_fetch_assoc($count_result);
+    $total_records = $count_row['total'];
+    $total_pages = ceil($total_records / $limit);
 ?>
 
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-    <title>Quản Lí Sinh Viên</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Quản Lý Sinh Viên</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <style>
         body {
-            background: linear-gradient(135deg, #2c3e50, #3498db); /* Gradient xanh đậm giống edit_student.php */
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            font-family: 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            padding: 20px 0;
         }
         .container {
             background: #fff;
             padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            margin-top: 50px;
-            max-width: 1000px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin: 20px auto;
         }
         h1 {
             color: #2c3e50;
             font-weight: bold;
-            margin-bottom: 20px;
             text-align: center;
+            margin-bottom: 30px;
         }
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stats-card {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        .stats-card:hover { transform: translateY(-5px); }
+        .stats-card h3 { font-size: 1rem; margin-bottom: 10px; }
+        .stats-card .number { font-size: 2rem; font-weight: bold; }
         .btn-custom {
-            transition: all 0.3s ease;
+            border-radius: 20px;
+            padding: 8px 20px;
+            transition: all 0.3s;
         }
         .btn-custom:hover {
             transform: translateY(-2px);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-        .btn-primary {
-            background-color: #3498db;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-weight: bold;
-        }
-        .btn-primary:hover {
-            background-color: #2980b9;
-        }
-        .btn-danger {
-            background-color: #e74c3c;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 20px;
-        }
-        .btn-danger:hover {
-            background-color: #c0392b;
-        }
-        .btn-warning {
-            background-color: #f1c40f;
-            border: none;
-            color: #fff;
-            padding: 8px 15px;
-            border-radius: 20px;
-        }
-        .btn-warning:hover {
-            background-color: #d4ac0d;
-        }
-        .btn-secondary {
-            background-color: #7f8c8d;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-weight: bold;
-        }
-        .btn-secondary:hover {
-            background-color: #6c757d;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
         .table {
-            border-radius: 5px;
+            background: white;
+            border-radius: 10px;
             overflow: hidden;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
         }
         .table th {
-            background-color: #34495e;
+            background: #34495e;
             color: white;
+            font-weight: 500;
+            padding: 12px;
             text-align: center;
         }
         .table td {
-            vertical-align: middle;
+            padding: 12px;
             text-align: center;
+            vertical-align: middle;
         }
         .search-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 5px;
-            margin-bottom: 25px;
+            max-width: 500px;
+            margin-right: 20px;
         }
-        .search-container .form-control {
-            border-radius: 20px 0 0 20px;
-            border: 1px solid #ddd;
-            padding: 10px;
-            width: 300px;
+        .action-buttons { display: flex; gap: 5px; justify-content: center; }
+        .pagination { margin-top: 20px; justify-content: center; }
+        .pagination .page-link {
+            border-radius: 5px;
+            margin: 0 3px;
+            color: #3498db;
         }
-        .search-container .btn-primary {
-            border-radius: 0 20px 20px 0;
-            margin-left: -1px;
-        }
-        .search-container .btn-primary:hover {
-            background-color: #2980b9;
-        }
-        a.text-light, a.text-decoration-none {
-            text-decoration: none;
-            color: white;
-        }
-        .button-group {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-        }
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
+        .pagination .active .page-link {
+            background: #3498db;
+            border-color: #3498db;
         }
     </style>
-  </head>
-  <body>
-    <div class="container mt-5">
-        <h1 class="text-center">Quản Lí Sinh Viên</h1>
-        <div class="search-container">
-            <form class="d-flex" method="GET" action="display.php">
-                <input class="form-control" type="search" placeholder="Tìm kiếm" aria-label="Search" name="search" value="<?php echo $search_query; ?>">
-                <button class="btn btn-primary btn-custom" type="submit">Tìm kiếm</button>
+</head>
+<body>
+    <div class="container">
+        <h1>Quản Lý Sinh Viên</h1>
+
+        <div class="stats-cards">
+            <div class="stats-card">
+                <h3>Tổng số sinh viên</h3>
+                <div class="number"><?php echo $stats['total_users']; ?></div>
+            </div>
+            <div class="stats-card">
+                <h3>Số sinh viên</h3>
+                <div class="number"><?php echo $stats['total_students']; ?></div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <form method="GET" class="d-flex search-container">
+                <div class="input-group">
+                    <input type="text" class="form-control" name="search" 
+                           placeholder="Tìm kiếm theo MSSV, tên..." 
+                           value="<?php echo htmlspecialchars($search_query); ?>">
+                    <button class="btn btn-primary btn-custom" type="submit">
+                        <i class="fas fa-search"></i> Tìm kiếm
+                    </button>
+                </div>
             </form>
+            <div>
+                <a href="../signup1/register.php" class="btn btn-primary btn-custom">
+                    <i class="fas fa-plus"></i> Thêm
+                </a>
+                <a href="../signup1/admin_home.php" class="btn btn-secondary btn-custom ms-2">
+                    <i class="fas fa-arrow-left"></i> Quay lại
+                </a>
+            </div>
         </div>
-        <div class="button-group">
-            <button class="btn btn-primary btn-custom"><a href="add_student.php" class="text-light text-decoration-none">Thêm Sinh Viên</a></button>
-            <button class="btn btn-secondary btn-custom"><a href="../signup1/home.php" class="text-light"><i class="fas fa-arrow-left"></i> Quay lại</a></button>
-        </div>
-        <table class="table table-bordered mt-3">
-            <thead>
-                <tr>
-                    <th scope="col">STT</th>
-                    <th scope="col">Mã Sinh Viên</th>
-                    <th scope="col">Tên</th>
-                    <th scope="col">Email</th>
-                    <th scope="col">Số Điện Thoại</th>
-                    <th scope="col">Địa Chỉ</th>
-                    <th scope="col">Hành Động</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                if($result){
-                    $stt = 1;
-                    while($row = mysqli_fetch_assoc($result)){
-                        echo '<tr>
-                                <th scope="row">'.$stt.'</th>
-                                <td>'.$row['student_id'].'</td>
-                                <td>'.$row['name'].'</td>
-                                <td>'.$row['email'].'</td>
-                                <td>'.$row['phone'].'</td>
-                                <td>'.$row['address'].'</td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <a href="edit_student.php?id='.$row['id'].'" class="btn btn-warning btn-sm btn-custom">Sửa</a>
-                                        <a href="delete_student.php?id='.$row['id'].'" class="btn btn-danger btn-sm btn-custom" onclick="return confirm(\'Bạn có chắc chắn muốn xóa?\')">Xóa</a>
-                                    </div>
-                                </td>
-                              </tr>';
-                        $stt++;
+
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>MSSV</th>
+                        <th>Tên đăng nhập</th>
+                        <th>Email</th>
+                        <th>Số điện thoại</th>
+                        <th>Địa chỉ</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    if (!$result) {
+                        echo '<tr><td colspan="7" class="text-center text-danger">Lỗi truy vấn</td></tr>';
+                    } else if (mysqli_num_rows($result) > 0) {
+                        $stt = ($page - 1) * $limit + 1;
+                        while ($row = mysqli_fetch_assoc($result)) {
+                            echo '<tr>
+                                    <td>'.$stt.'</td>
+                                    <td>'.htmlspecialchars($row['mssv']).'</td>
+                                    <td>'.htmlspecialchars($row['username']).'</td>
+                                    <td>'.htmlspecialchars($row['email']).'</td>
+                                    <td>'.htmlspecialchars($row['mobile']).'</td>
+                                    <td>'.htmlspecialchars($row['address']).'</td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <a href="edit_user.php?id='.$row['id'].'" 
+                                               class="btn btn-warning btn-sm btn-custom">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="delete_user.php?id='.$row['id'].'" 
+                                               class="btn btn-danger btn-sm btn-custom"
+                                               onclick="return confirm(\'Bạn có chắc chắn muốn xóa?\')">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                  </tr>';
+                            $stt++;
+                        }
+                    } else {
+                        echo '<tr><td colspan="7" class="text-center">Không tìm thấy dữ liệu</td></tr>';
                     }
-                }
+                    ?>
+                </tbody>
+            </table>
+        </div>
+
+        <?php if ($total_pages > 1): ?>
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                <?php if ($page > 1): ?>
+                    <li class="page-item">
+                        <a class="page-link" href="?page=<?php echo ($page-1); ?>&search=<?php echo urlencode($search_query); ?>">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+                <?php endif; ?>
+
+                <?php
+                $start = max(1, min($page - 1, $total_pages - 2));
+                $end = min($total_pages, $start + 2);
+                
+                for ($i = $start; $i <= $end; $i++):
                 ?>
-            </tbody>
-        </table>
+                    <li class="page-item <?php echo $page == $i ? 'active' : ''; ?>">
+                        <a class="page-link" href="?page=<?php echo $i; ?>&search=<?php echo urlencode($search_query); ?>">
+                            <?php echo $i; ?>
+                        </a>
+                    </li>
+                <?php endfor; ?>
+
+                <?php if ($page < $total_pages): ?>
+                    <li class="page-item">
+                        <a class="page-link" href="?page=<?php echo ($page+1); ?>&search=<?php echo urlencode($search_query); ?>">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                <?php endif; ?>
+            </ul>
+        </nav>
+        <?php endif; ?>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  </body>
+</body>
 </html>

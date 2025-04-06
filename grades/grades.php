@@ -188,7 +188,7 @@
         </div>
         <div class="button-group">
             <button class="btn btn-primary btn-custom"><a href="add_grades.php" class="text-light text-decoration-none">Thêm Điểm</a></button>
-            <button class="btn btn-secondary btn-custom"><a href="../signup1/home.php" class="text-light text-decoration-none"><i class="fas fa-arrow-left"></i> Quay lại</a></button>
+            <button class="btn btn-secondary btn-custom"><a href="../signup1/admin_home.php" class="text-light text-decoration-none"><i class="fas fa-arrow-left"></i> Quay lại</a></button>
         </div>
         <table class="table mt-3">
             <thead>
